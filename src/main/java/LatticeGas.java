@@ -10,13 +10,6 @@ public class LatticeGas {
 
         Properties properties = new Properties();
 
-//        try {
-//            FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
-//            myWriter.close();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
         try {
             ConsoleParser.parseArguments(args, properties);
         } catch (IllegalArgumentException e) {
@@ -24,19 +17,13 @@ public class LatticeGas {
             return;
         }
 
-        Cell[][] cells = initializeCells(10, 10);
+        Cell[][] cells = Cell.initializeCells(10, 10);
 
-        cells[0][0].createParticle(1);
-        cells[0][2].createParticle(4);
-        cells[9][0].createParticle(0);
-        cells[8][2].createParticle(0);
-        cells[8][1].createParticle(0);
-        cells[6][5].createParticle(0);
-        cells[5][5].createParticle(0);
         printCells(cells);
         System.out.println("\n");
         try {
             FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
+            PrintWriter printWriter = new PrintWriter(myWriter);
             myWriter.write("5\n");
             myWriter.write("1\n");
             myWriter.write("10 10\n");
@@ -49,12 +36,13 @@ public class LatticeGas {
                         boolean[] inDirections = collectDirections(cells, i, j, i % 2 != 0);
                         boolean[] outDirections = evaluate(inDirections, cells[i][j]);
                         cells[i][j].setNewDirections(outDirections);
+
+                        printOutputToFile(printWriter, cells, j, i);
                     }
                 }
                 updateCellsWithNewDirections(cells);
                 System.out.println("Iteration " + (times + 1));
                 printCells(cells);
-                updateOutputToFile(myWriter, cells);
             }
             myWriter.close();
         } catch (Exception e) {
@@ -62,18 +50,20 @@ public class LatticeGas {
         }
     }
 
-    private static void updateOutputToFile(FileWriter myWriter, Cell[][] cells) throws Exception{
-        myWriter.write("nada");
-    }
-
-    private static Cell[][] initializeCells(int horizontal, int vertical) {
-        Cell[][] cells = new Cell[10][10];
-        for (int i = 0; i < vertical; i++) {
-            for (int j = 0; j < horizontal; j++) {
-                cells[i][j] = new Cell(false);
-            }
-        }
-        return cells;
+    private static void printOutputToFile(PrintWriter printWriter, Cell[][] cells, int j, int i) {
+        printWriter.printf("%d %d %d %d %d %d %d %d %d %d %d\n",
+                j,
+                i,
+                cells[i][j].getDirections()[1] ? 1 : 0,
+                cells[i][j].getDirections()[0] ? 1 : 0,
+                cells[i][j].getDirections()[5] ? 1 : 0,
+                cells[i][j].getDirections()[4] ? 1 : 0,
+                cells[i][j].getDirections()[3] ? 1 : 0,
+                cells[i][j].getDirections()[2] ? 1 : 0,
+                cells[i][j].isSolid() ? 1 : 0,
+                cells[i][j].isSolid() ? 1 : 0,
+                cells[i][j].getRandom()
+        );
     }
 
     private static void updateCellsWithNewDirections(Cell[][] cells) {
@@ -114,10 +104,6 @@ public class LatticeGas {
             directions[0] = checkNeighbour(cells, i - 1, j, 3);
             directions[5] = checkNeighbour(cells, i - 1, j - 1, 2);
         }
-
-//        if (directions[0] || directions[1] || directions[2] || directions[3] || directions[4] || directions[5])
-//            System.out.println("i: " + i + " j: " + j + " directions: " + directions[0] + " " + directions[1] + " " + directions[2] + " " + directions[3] + " " + directions[4] + " " + directions[5]);
-
         return directions;
     }
 

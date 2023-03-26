@@ -47,5 +47,24 @@ public class Cell {
         this.random = random;
     }
 
+    public static Cell[][] initializeCells(int horizontal, int vertical) {
+        Cell[][] cells = new Cell[vertical][horizontal];
+        for (int i = 0; i < vertical; i++) {
+            for (int j = 0; j < horizontal; j++) {
+                cells[i][j] = new Cell(false);
+            }
+        }
+
+        cells[0][0].createParticle(1);
+        cells[0][2].createParticle(4);
+        cells[9][0].createParticle(0);
+        cells[8][2].createParticle(0);
+        cells[8][1].createParticle(0);
+        cells[6][5].createParticle(0);
+        cells[5][5].createParticle(0);
+
+        return cells;
+    }
+
 
 }
