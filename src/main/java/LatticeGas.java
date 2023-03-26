@@ -9,20 +9,34 @@ public class LatticeGas {
                 cells[i][j] = new Cell(false);
             }
         }
+        cells[0][0].createParticle(1);
+        cells[0][2].createParticle(4);
         cells[9][0].createParticle(0);
         cells[8][2].createParticle(0);
         cells[8][1].createParticle(0);
         cells[6][5].createParticle(0);
         cells[5][5].createParticle(0);
         printCells(cells);
-        while (true) {
+        System.out.println("\n");
+        for (int times = 0; times < 3; times++) {
             for (int i = 0; i < cells.length; i++) {
                 for (int j = 0; j < cells[i].length; j++) {
-                    cells[i][j].setDirections(cells[i][j].getNewDirections());
+//                    cells[i][j].setDirections(cells[i][j].getNewDirections());
                     boolean[] inDirections = collectDirections(i, j, i % 2 != 0);
                     boolean[] outDirections = evaluate(inDirections, cells[i][j]);
                     cells[i][j].setNewDirections(outDirections);
                 }
+            }
+            updateCellsWithNewDirections(cells);
+            System.out.println("Iteration " + (times + 1));
+            printCells(cells);
+        }
+    }
+
+    private static void updateCellsWithNewDirections(Cell[][] cells) {
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[i].length; j++) {
+                cells[i][j].setDirections(cells[i][j].getNewDirections());
             }
         }
     }
@@ -31,22 +45,35 @@ public class LatticeGas {
     //i -> impar: (i - 1, j) B , (i + 1, j) E, (i, j + 1) A, (i + 1, j + 1) F, (i, j - 1) C, (i + 1, j - 1) D
     static boolean[] collectDirections(int i, int j, boolean isOdd) {
         boolean[] directions = new boolean[6];
-        directions[4] = checkNeighbour(i - 1, j, 1);
-        directions[1] = checkNeighbour(i + 1, j, 4);
+//        directions[4] = checkNeighbour(i - 1, j, 1);
+//        directions[1] = checkNeighbour(i + 1, j, 4);
+//        if (isOdd) {
+//            directions[3] = checkNeighbour(i, j + 1, 0);
+//            directions[2] = checkNeighbour(i + 1, j + 1, 5);
+//            directions[5] = checkNeighbour(i, j - 1, 2);
+//            directions[0] = checkNeighbour(i + 1, j - 1, 3);
+//        } else {
+//            directions[2] = checkNeighbour(i, j + 1, 5);
+//            directions[3] = checkNeighbour(i - 1, j + 1, 0);
+//            directions[0] = checkNeighbour(i, j - 1, 3);
+//            directions[5] = checkNeighbour(i - 1, j - 1, 2);
+//        }
+        directions[4] = checkNeighbour(i, j - 1, 1);
+        directions[1] = checkNeighbour(i, j + 1, 4);
         if (isOdd) {
-            directions[3] = checkNeighbour(i, j + 1, 0);
+            directions[3] = checkNeighbour(i + 1, j, 0);
             directions[2] = checkNeighbour(i + 1, j + 1, 5);
-            directions[5] = checkNeighbour(i, j - 1, 2);
-            directions[0] = checkNeighbour(i + 1, j - 1, 3);
+            directions[5] = checkNeighbour(i - 1, j, 2);
+            directions[0] = checkNeighbour(i - 1, j + 1, 3);
         } else {
-            directions[2] = checkNeighbour(i, j + 1, 5);
-            directions[3] = checkNeighbour(i - 1, j + 1, 0);
-            directions[0] = checkNeighbour(i, j - 1, 3);
+            directions[2] = checkNeighbour(i + 1, j, 5);
+            directions[3] = checkNeighbour(i + 1, j - 1, 0);
+            directions[0] = checkNeighbour(i - 1, j, 3);
             directions[5] = checkNeighbour(i - 1, j - 1, 2);
         }
 
-        if (directions[0] || directions[1] || directions[2] || directions[3] || directions[4] || directions[5])
-            System.out.println("i: " + i + " j: " + j + " directions: " + directions[0] + " " + directions[1] + " " + directions[2] + " " + directions[3] + " " + directions[4] + " " + directions[5]);
+//        if (directions[0] || directions[1] || directions[2] || directions[3] || directions[4] || directions[5])
+//            System.out.println("i: " + i + " j: " + j + " directions: " + directions[0] + " " + directions[1] + " " + directions[2] + " " + directions[3] + " " + directions[4] + " " + directions[5]);
 
         return directions;
     }
@@ -102,7 +129,21 @@ public class LatticeGas {
     static void printCells(Cell[][] cells) {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
-                System.out.print(cells[i][j].getDirections()[0] ? "1" : "0");
+                if (cells[i][j].getDirections()[1]) {
+                    System.out.print("1");
+                } else if (cells[i][j].getDirections()[4]) {
+                    System.out.print("4");
+                } else if (cells[i][j].getDirections()[2]) {
+                    System.out.print("2");
+                } else if (cells[i][j].getDirections()[3]) {
+                    System.out.print("3");
+                } else if (cells[i][j].getDirections()[5]) {
+                    System.out.print("5");
+                } else if (cells[i][j].getDirections()[0]) {
+                    System.out.print("0");
+                } else {
+                    System.out.print("-");
+                }
             }
             System.out.println();
         }
