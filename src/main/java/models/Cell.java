@@ -12,7 +12,7 @@ public class Cell {
     }
 
     public void createParticle(int direction) {
-        directions[direction] = true;
+        newDirections[direction] = true;
     }
 
     public boolean[] getDirections() {
