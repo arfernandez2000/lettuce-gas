@@ -1,14 +1,31 @@
 import models.Cell;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class LatticeGas {
-    static Cell[][] cells = new Cell[10][10];
 
     public static void main(String[] args) {
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells[i].length; j++) {
-                cells[i][j] = new Cell(false);
-            }
+
+        Properties properties = new Properties();
+
+//        try {
+//            FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
+//            myWriter.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        try {
+            ConsoleParser.parseArguments(args, properties);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
         }
+
+        Cell[][] cells = initializeCells(10, 10);
+
         cells[0][0].createParticle(1);
         cells[0][2].createParticle(4);
         cells[9][0].createParticle(0);
@@ -18,19 +35,45 @@ public class LatticeGas {
         cells[5][5].createParticle(0);
         printCells(cells);
         System.out.println("\n");
-        for (int times = 0; times < 3; times++) {
-            for (int i = 0; i < cells.length; i++) {
-                for (int j = 0; j < cells[i].length; j++) {
+        try {
+            FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
+            myWriter.write("5\n");
+            myWriter.write("1\n");
+            myWriter.write("10 10\n");
+            myWriter.write("timestep?\n");
+
+            for (int times = 0; times < 3; times++) {
+                for (int i = 0; i < cells.length; i++) {
+                    for (int j = 0; j < cells[i].length; j++) {
 //                    cells[i][j].setDirections(cells[i][j].getNewDirections());
-                    boolean[] inDirections = collectDirections(i, j, i % 2 != 0);
-                    boolean[] outDirections = evaluate(inDirections, cells[i][j]);
-                    cells[i][j].setNewDirections(outDirections);
+                        boolean[] inDirections = collectDirections(cells, i, j, i % 2 != 0);
+                        boolean[] outDirections = evaluate(inDirections, cells[i][j]);
+                        cells[i][j].setNewDirections(outDirections);
+                    }
                 }
+                updateCellsWithNewDirections(cells);
+                System.out.println("Iteration " + (times + 1));
+                printCells(cells);
+                updateOutputToFile(myWriter, cells);
             }
-            updateCellsWithNewDirections(cells);
-            System.out.println("Iteration " + (times + 1));
-            printCells(cells);
+            myWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private static void updateOutputToFile(FileWriter myWriter, Cell[][] cells) throws Exception{
+        myWriter.write("nada");
+    }
+
+    private static Cell[][] initializeCells(int horizontal, int vertical) {
+        Cell[][] cells = new Cell[10][10];
+        for (int i = 0; i < vertical; i++) {
+            for (int j = 0; j < horizontal; j++) {
+                cells[i][j] = new Cell(false);
+            }
+        }
+        return cells;
     }
 
     private static void updateCellsWithNewDirections(Cell[][] cells) {
@@ -43,7 +86,7 @@ public class LatticeGas {
 
     //i -> par: (i - 1, j) B, (i + 1, j) E, (i, j + 1) F, (i - 1, j + 1) A, (i, j - 1) D, (i - 1, j - 1) C
     //i -> impar: (i - 1, j) B , (i + 1, j) E, (i, j + 1) A, (i + 1, j + 1) F, (i, j - 1) C, (i + 1, j - 1) D
-    static boolean[] collectDirections(int i, int j, boolean isOdd) {
+    static boolean[] collectDirections(Cell[][] cells, int i, int j, boolean isOdd) {
         boolean[] directions = new boolean[6];
 //        directions[4] = checkNeighbour(i - 1, j, 1);
 //        directions[1] = checkNeighbour(i + 1, j, 4);
@@ -58,18 +101,18 @@ public class LatticeGas {
 //            directions[0] = checkNeighbour(i, j - 1, 3);
 //            directions[5] = checkNeighbour(i - 1, j - 1, 2);
 //        }
-        directions[4] = checkNeighbour(i, j - 1, 1);
-        directions[1] = checkNeighbour(i, j + 1, 4);
+        directions[4] = checkNeighbour(cells, i, j - 1, 1);
+        directions[1] = checkNeighbour(cells, i, j + 1, 4);
         if (isOdd) {
-            directions[3] = checkNeighbour(i + 1, j, 0);
-            directions[2] = checkNeighbour(i + 1, j + 1, 5);
-            directions[5] = checkNeighbour(i - 1, j, 2);
-            directions[0] = checkNeighbour(i - 1, j + 1, 3);
+            directions[3] = checkNeighbour(cells, i + 1, j, 0);
+            directions[2] = checkNeighbour(cells, i + 1, j + 1, 5);
+            directions[5] = checkNeighbour(cells, i - 1, j, 2);
+            directions[0] = checkNeighbour(cells, i - 1, j + 1, 3);
         } else {
-            directions[2] = checkNeighbour(i + 1, j, 5);
-            directions[3] = checkNeighbour(i + 1, j - 1, 0);
-            directions[0] = checkNeighbour(i - 1, j, 3);
-            directions[5] = checkNeighbour(i - 1, j - 1, 2);
+            directions[2] = checkNeighbour(cells, i + 1, j, 5);
+            directions[3] = checkNeighbour(cells, i + 1, j - 1, 0);
+            directions[0] = checkNeighbour(cells, i - 1, j, 3);
+            directions[5] = checkNeighbour(cells, i - 1, j - 1, 2);
         }
 
 //        if (directions[0] || directions[1] || directions[2] || directions[3] || directions[4] || directions[5])
@@ -78,7 +121,7 @@ public class LatticeGas {
         return directions;
     }
 
-    static boolean checkNeighbour(int i, int j, int index) {
+    static boolean checkNeighbour(Cell[][] cells, int i, int j, int index) {
         try {
             return cells[i][j].getDirections()[index];
         } catch (ArrayIndexOutOfBoundsException e) {
