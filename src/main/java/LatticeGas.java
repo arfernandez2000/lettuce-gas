@@ -29,7 +29,7 @@ public class LatticeGas {
             myWriter.write("10 10\n");
 
             for (int times = 0; times < 3; times++) {
-                printWriter.printf("%d\n", times++);
+                printWriter.printf("%d\n", times);
                 for (int i = 0; i < cells.length; i++) {
                     for (int j = 0; j < cells[i].length; j++) {
 //                    cells[i][j].setDirections(cells[i][j].getNewDirections());

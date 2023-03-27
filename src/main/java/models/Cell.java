@@ -51,7 +51,14 @@ public class Cell {
         Cell[][] cells = new Cell[vertical][horizontal];
         for (int i = 0; i < vertical; i++) {
             for (int j = 0; j < horizontal; j++) {
-                cells[i][j] = new Cell(false);
+                // Create a solid border
+                if(i == 0 || j == 0 || i == vertical - 1 || j == horizontal - 1)
+                    cells[i][j] = new Cell(true);
+                // Create a wall in the middle
+                else if(i == vertical / 2)
+                    cells[i][j] = new Cell(true);
+                else
+                    cells[i][j] = new Cell(false);
             }
         }
 
