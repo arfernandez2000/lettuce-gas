@@ -27,9 +27,9 @@ public class LatticeGas {
             myWriter.write("5\n");
             myWriter.write("1\n");
             myWriter.write("10 10\n");
-            myWriter.write("timestep?\n");
 
             for (int times = 0; times < 3; times++) {
+                printWriter.printf("%d\n", times++);
                 for (int i = 0; i < cells.length; i++) {
                     for (int j = 0; j < cells[i].length; j++) {
 //                    cells[i][j].setDirections(cells[i][j].getNewDirections());
