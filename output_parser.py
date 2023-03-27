@@ -23,10 +23,8 @@ def parse_data(output_file, frames, borders):
                 frame_lines = []
                 i = 0
             i += 1
-        df = pd.DataFrame(np.array(frame_lines, dtype=object), columns=["x", "y", "anlges"])
+        df = pd.DataFrame(np.array(frame_lines, dtype=object), columns=["x", "y", "angles"])
         frames.append(df)
-    print(frames)
-    print(borders)
 
 # 0
 # 3	1	0	0	0	1	0	0	0	0	1
@@ -51,9 +49,7 @@ def calculate_info(i, ll, borders):
         line_content.append(angles)
 
         if ll[len(ll) - 1] == "1":
-            print("ENTRE")
             borders.append([x, y])
-            print("BORDERS: ", borders)
 
     return line_content
 

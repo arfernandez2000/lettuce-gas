@@ -1,7 +1,11 @@
 # Example file showing a basic pygame "game loop"
 import pygame
+from output_parser import parse_data
 from polygonHelper import OFFSET_Y, draw_hexagon_row, draw_main_hexagons, draw_regular_polygon
 
+frames = []
+borders = []
+parse_data("src/main/resources/output.txt", frames, borders)
 
 
 HEX_RADIUS = 50
