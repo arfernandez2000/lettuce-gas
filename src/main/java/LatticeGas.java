@@ -33,6 +33,7 @@ public class LatticeGas {
             printWriter.println(properties.getH() + "\t" + properties.getV());
 
             int particles_right = 0;
+            int particles_left = 0;
             int iterations = 0;
             long start = System.currentTimeMillis();
             System.out.println("Particles right: " + particles_right);
@@ -42,6 +43,7 @@ public class LatticeGas {
 //            for(int l = 0; l < 5; l++) {
                 printWriter.println(iterations);
                 particles_right = 0;
+                particles_left = 0;
                 for (int i = 0; i < cells.length; i++) {
                     for (int j = 0; j < cells[i].length; j++) {
                         boolean[] inDirections = collectDirections(cells, i, j, i % 2 != 0);
@@ -53,15 +55,18 @@ public class LatticeGas {
                         cells[i][j].setNewDirections(outDirections);
                         if (j > 100)
                             particles_right += countCollisions(outDirections);
-
-                        printOutputToFile(printWriter, cells, j, i);
+                        else
+                            particles_left += countCollisions(outDirections);
+//                        printOutputToFile(printWriter, cells, j, i);
                     }
                 }
                 updateCellsWithNewDirections(cells);
-//                printCells(cells);
+                String aux = printCells(cells);
+                printWriter.println(aux);
                 iterations++;
                 if(particles_right % 100 == 0 || particles_right > 2000) {
                     System.out.println("Particles right: " + particles_right);
+                    System.out.println("Particles left: " + particles_left);
                     System.out.println(iterations);
                 }
             }
@@ -149,21 +154,7 @@ public class LatticeGas {
         // When there are 3 particles colliding, we can simply invert the inDirections array
         else if (collisionCount == 3) {
             //TODO: casos head on + spectator
-            switch (distanceTrueThree(inDirections)) {
-                case 0: {
-                    for (int i = 0; i < outDirections.length; i++) {
-                        outDirections[i] = !inDirections[i];
-                    }
-                }
-                case 1: {
-                    headOn(inDirections, outDirections, 0);
-                }
-                case 2: {
-                    headOn(inDirections, outDirections, 1);
-                }
-                break;
-            }
-
+            distanceTrueThree(inDirections, outDirections);
         }
         else if(collisionCount == 4) {
             if(distanceFalseTwo(inDirections) == 0) {
@@ -223,7 +214,7 @@ public class LatticeGas {
         return ((second - first) + 6) % 6;
     }
 
-    private static int distanceTrueThree(boolean[] inDirections) {
+    private static void distanceTrueThree(boolean[] inDirections, boolean[] outDirections) {
         int first = -1;
         int second = -1;
         int third = -1;
@@ -241,31 +232,47 @@ public class LatticeGas {
         int distance1 = ((second - first) + 6) % 6;
         int distance2 = ((third - second) + 6) % 6;
         int distance3 = ((first - third) + 6) % 6;
-        if(distance1 == 3)
-            return inDirections[(third + 1) % 6]? 1 : 2;
-        else if(distance2 == 3)
-            return inDirections[(first + 1) % 6]? 1 : 2;
-        else if(distance3 == 3)
-            return inDirections[(second + 1) % 6]? 1 : 2;
-        else
-            return 0;
+        int spectator = -1;
+        int random = -1;
+        if(distance1 == 3) {
+            spectator = third;
+            random = inDirections[(third + 1) % 6] ? 0 : 1;
+        } else if(distance2 == 3) {
+            spectator = first;
+            random = inDirections[(first + 1) % 6] ? 0 : 1;
+        } else if(distance3 == 3) {
+            spectator = second;
+            random = inDirections[(second + 1) % 6] ? 0 : 1;
+        }
+        if(spectator != -1) {
+            inDirections[spectator] = false;
+            headOn(inDirections, outDirections, random);
+            outDirections[spectator] = true;
+        }
+        else {
+            for (int i = 0; i < outDirections.length; i++) {
+                outDirections[i] = !inDirections[i];
+            }
+        }
     }
 
-    static void printCells(Cell[][] cells) {
+    static String printCells(Cell[][] cells) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb_line = new StringBuilder();
                 for (int k = 0; k < cells[i][j].getDirections().length; k++) {
                     if(cells[i][j].getDirections()[k])
-                        sb.append(k);
+                        sb_line.append(k);
                 }
-                if(sb.length() == 0)
-                    sb.append("-");
+                if(sb_line.length() == 0)
+                    sb_line.append("-");
                 if(cells[i][j].isSolid())
-                    sb = new StringBuilder("|");
-                System.out.print(sb + " ");
+                    sb_line = new StringBuilder("||");
+                sb.append(sb_line).append("\t");
             }
-            System.out.println();
+            sb.append("\n");
         }
+        return sb.toString();
     }
 }

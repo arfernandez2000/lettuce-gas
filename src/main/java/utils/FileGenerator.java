@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class FileGenerator {
 
-    private static final int UPPER_I = 198;
-    private static final int UPPER_J = 98;
+    private static final int UPPER_I = 199;
+    private static final int UPPER_J = 99;
     private static final int LOWER = 1;
 
     public static void main(String[] args) {
