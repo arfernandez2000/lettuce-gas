@@ -8,11 +8,11 @@ public class Cell {
     private boolean[] directions = new boolean[6];
     private boolean[] newDirections = new boolean[6];
     private boolean solid;
-    private long random;
+    private int random;
 
     public Cell(boolean solid) {
         this.solid = solid;
-        this.random = Math.round(Math.random());
+        this.random = (int) Math.round(Math.random());
     }
 
     public void createParticle(int direction) {
@@ -43,15 +43,15 @@ public class Cell {
         this.solid = solid;
     }
 
-    public long getRandom() {
+    public int getRandom() {
         return random;
     }
 
-    public void setRandom(long random) {
+    public void setRandom(int random) {
         this.random = random;
     }
 
-    public static Cell[][] initializeCells(int horizontal, int vertical, String dynamicFile) throws FileNotFoundException {
+    public static Cell[][] initializeCells(int horizontal, int vertical, int d, String dynamicFile) throws FileNotFoundException {
 
         Cell[][] cells = new Cell[vertical][horizontal];
         for (int i = 0; i < vertical; i++) {
@@ -60,7 +60,7 @@ public class Cell {
                 if(i == 0 || j == 0 || i == vertical - 1 || j == horizontal - 1)
                     cells[i][j] = new Cell(true);
                 // Create a wall in the middle
-                else if(j == horizontal / 2 && (i < vertical / 2 - 25 || i >= vertical / 2 + 25))
+                else if(j == horizontal / 2 && (i < vertical / 2 - d/2 || i >= vertical / 2 + d/2))
                     cells[i][j] = new Cell(true);
                 else
                     cells[i][j] = new Cell(false);

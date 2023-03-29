@@ -8,16 +8,15 @@ import org.apache.commons.cli.*;
  */
 public class ConsoleParser {
 
-    public static String staticFile;
     public static String dynamicFile;
 
     private static Options createOptions(){
         Options options = new Options();
 
-        Option staticFile = Option.builder("staticFile")
+        Option staticFile = Option.builder("N")
                 .hasArg()
                 .required(true)
-                .desc("Path al archivo de valores estáticos").build();
+                .desc("Cantidad de partículas").build();
         options.addOption(staticFile);
 
         Option dynamicFile = Option.builder("dynamicFile")
@@ -28,6 +27,7 @@ public class ConsoleParser {
 
         options.addOption("H",true, "Cantidad de celdas horizontales");
         options.addOption("V",true, "Cantidad de celdas verticales");
+        options.addOption("D",true, "Tamaño de la rejilla");
         return options;
     }
 
@@ -43,12 +43,18 @@ public class ConsoleParser {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("H")) {
                 properties.setH(Integer.parseInt(cmd.getOptionValue("H")));
-            }
+            } else
+                properties.setH(200);
             if (cmd.hasOption("V")) {
                 properties.setV(Integer.parseInt(cmd.getOptionValue("V")));
-            }
+            } else
+                properties.setV(200);
+            if (cmd.hasOption("D")) {
+                properties.setV(Integer.parseInt(cmd.getOptionValue("D")));
+            } else
+                properties.setD(50);
             dynamicFile = cmd.getOptionValue("dynamicFile");
-            staticFile = cmd.getOptionValue("staticFile");
+            properties.setN(Integer.parseInt(cmd.getOptionValue("N")));
 
         } catch (ParseException e) {
             printHelp(helper, e, options);
