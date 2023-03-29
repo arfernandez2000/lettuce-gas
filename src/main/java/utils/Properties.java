@@ -1,3 +1,5 @@
+package utils;
+
 public class Properties {
 
     public Integer getH() {

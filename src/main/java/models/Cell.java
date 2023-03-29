@@ -1,5 +1,9 @@
 package models;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Cell {
     private boolean[] directions = new boolean[6];
     private boolean[] newDirections = new boolean[6];
@@ -47,7 +51,8 @@ public class Cell {
         this.random = random;
     }
 
-    public static Cell[][] initializeCells(int horizontal, int vertical) {
+    public static Cell[][] initializeCells(int horizontal, int vertical, String dynamicFile) throws FileNotFoundException {
+
         Cell[][] cells = new Cell[vertical][horizontal];
         for (int i = 0; i < vertical; i++) {
             for (int j = 0; j < horizontal; j++) {
@@ -55,22 +60,30 @@ public class Cell {
                 if(i == 0 || j == 0 || i == vertical - 1 || j == horizontal - 1)
                     cells[i][j] = new Cell(true);
                 // Create a wall in the middle
-                else if(i == vertical / 2)
+                else if(j == horizontal / 2 && (i < vertical / 2 - 25 || i >= vertical / 2 + 25))
                     cells[i][j] = new Cell(true);
                 else
                     cells[i][j] = new Cell(false);
             }
         }
-
-        cells[0][0].createParticle(1);
-        cells[0][2].createParticle(4);
-        cells[9][0].createParticle(0);
-        cells[8][2].createParticle(0);
-        cells[8][1].createParticle(0);
-        cells[6][5].createParticle(0);
-        cells[5][5].createParticle(0);
+        readDynamic(cells, dynamicFile);
 
         return cells;
+    }
+
+    public static void readDynamic(Cell[][] cells, String dynamicFile) throws FileNotFoundException {
+        File file = new File(dynamicFile);
+        Scanner sc = new Scanner(file);
+
+        //Skip first line
+        sc.nextLine();
+        while (sc.hasNextLine()){
+            int i = sc.nextInt();
+            int j = sc.nextInt();
+            cells[i][j].createParticle(sc.nextInt());
+        }
+
+        sc.close();
     }
 
 

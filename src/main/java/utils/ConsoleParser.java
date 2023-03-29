@@ -1,3 +1,5 @@
+package utils;
+
 import org.apache.commons.cli.*;
 
 /**
@@ -49,10 +51,40 @@ public class ConsoleParser {
             staticFile = cmd.getOptionValue("staticFile");
 
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            helper.printHelp("Modo de uso:", options);
-            System.exit(0);
+            printHelp(helper, e, options);
         }
     }
+
+    public static int parseArgumentsFileGenerator(String[] args) throws IllegalArgumentException {
+
+        Options options = new Options();
+        Option dynamicFile = Option.builder("N")
+                .hasArg()
+                .required(true)
+                .desc("Cantidad de partículas").build();
+        options.addOption(dynamicFile);
+
+        CommandLine cmd;
+        CommandLineParser parser = new BasicParser();
+        HelpFormatter helper = new HelpFormatter();
+
+        try {
+            cmd = parser.parse(options, args);
+            return Integer.parseInt(cmd.getOptionValue("N"));
+
+        } catch (ParseException e) {
+            printHelp(helper, e, options);
+        }
+
+        return 0;
+    }
+
+    static void printHelp(HelpFormatter helper, ParseException e, Options options) {
+        System.out.println(e.getMessage());
+        helper.printHelp("Modo de uso:", options);
+        System.exit(0);
+    }
+
+
 }
 
