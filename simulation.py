@@ -1,7 +1,7 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 from output_parser import parse_data
-from polygonHelper import OFFSET_Y, draw_hexagon_row, draw_main_hexagons, draw_regular_polygon
+from polygonHelper import OFFSET_Y, draw_hexagon_row, draw_main_hexagons, draw_middle_wall, draw_regular_polygon, draw_solid_hexagon
 
 frames = []
 borders = []
@@ -27,10 +27,13 @@ while running:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+    screen.fill("white")
 
     # def draw_main_hexagons(surface, color, radius, initial_position, cols, rows):
-    draw_main_hexagons(screen, pygame.Color(0,0,0), HEX_RADIUS, (X_START_EVEN, Y_START), 10, 10)
+    draw_main_hexagons(screen, pygame.Color(0,0,0), HEX_RADIUS, (X_START_EVEN, Y_START), 200, 200)
+    draw_middle_wall(screen, pygame.Color(255,255,0), HEX_RADIUS, 10, 200)
+
+    draw_solid_hexagon(screen, pygame.Color(255,255,0), HEX_RADIUS, 2,4)
 
     # draw_hexagon_row(screen, pygame.Color(100,100,10), HEX_RADIUS, (X_START_EVEN, Y_START + 0 * HEX_RADIUS*2), 10)
     # draw_hexagon_row(screen, pygame.Color(100,100,10), HEX_RADIUS, (X_START_ODD, Y_START + 1 * HEX_RADIUS*2), 10)

@@ -100,7 +100,6 @@ public class LatticeGas {
                 printOutputToFile(printWriter, cells, j, i);
             }
         }
-        printWriter.println("--------");
     }
 
     private static void printOutputToFile(PrintWriter printWriter, Cell[][] cells, int j, int i) {
@@ -110,7 +109,7 @@ public class LatticeGas {
                  continue;
             }
 //            printWriter.print(particle.getId() + " " +j " " + particle.getDirection());
-            printWriter.printf("%d\t%d\t%d\t%s\n", particle.getId(), j, i, particle.getDirection());
+            printWriter.printf("%d\t%d\t%d\t%d\t%s\n", particle.getId(), j, i, 0, particle.getDirection());
         }
 //        printWriter.println();
 //        printWriter.printf("%d %d %d %d %d %d %d %d %d %d %d\n",
