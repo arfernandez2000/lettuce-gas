@@ -140,7 +140,7 @@ public class Cell {
         Particle[] rotatedParticles = new Particle[6];
         for (int i = 0; i < rotatedParticles.length; i++) {
             if(particles[i] != null)
-                rotatedParticles[i] = new Particle(particles[i].getDirection().rotate(random));
+                rotatedParticles[i] = new Particle(particles[i].getDirection().rotate(random), particles[i].getId());
         }
         return rotatedParticles;
     }

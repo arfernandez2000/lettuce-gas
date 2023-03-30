@@ -13,6 +13,11 @@ public class Particle {
         this.id = idCounter++;
     }
 
+    public Particle(Direction direction, int id) {
+        this.direction = direction;
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

@@ -46,7 +46,7 @@ public class LatticeGas {
             System.out.println("Particles total: " + properties.getN());
             System.out.println("Condición de corte: " + ((properties.getN() / 2) * (1 - EPSILON)));
 
-            printWriter.println(printCells(cells));
+//            printWriter.println(printCells(cells));
 
             while (particles_right < ((int)(properties.getN() / 2) * (1 - EPSILON))) {
 //            for(int l = 0; l < 5; l++) {
@@ -74,8 +74,10 @@ public class LatticeGas {
                     }
                 }
                 cells = updateCellsWithNewDirections(cells);
+                printOutput(printWriter, cells);
                 String aux = printCells(cells);
-                printWriter.println(aux);
+//                System.out.println(aux);
+//                printWriter.println(aux);
                 iterations++;
                 if(particles_right % 100 == 0 || particles_right > 2000) {
                     System.out.println("Particles right: " + particles_right);
@@ -92,20 +94,38 @@ public class LatticeGas {
         }
     }
 
+    private static void printOutput(PrintWriter printWriter, Cell[][] cells) {
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[i].length; j++) {
+                printOutputToFile(printWriter, cells, j, i);
+            }
+        }
+        printWriter.println("--------");
+    }
+
     private static void printOutputToFile(PrintWriter printWriter, Cell[][] cells, int j, int i) {
-        printWriter.printf("%d %d %d %d %d %d %d %d %d %d %d\n",
-                j,
-                i,
-                cells[i][j].getDirections()[1] ? 1 : 0,
-                cells[i][j].getDirections()[0] ? 1 : 0,
-                cells[i][j].getDirections()[5] ? 1 : 0,
-                cells[i][j].getDirections()[4] ? 1 : 0,
-                cells[i][j].getDirections()[3] ? 1 : 0,
-                cells[i][j].getDirections()[2] ? 1 : 0,
-                cells[i][j].isSolid() ? 1 : 0,
-                cells[i][j].isSolid() ? 1 : 0,
-                cells[i][j].getRandom()
-        );
+//        printWriter.println(cells[i][j].getParticles());
+        for (Particle particle : cells[i][j].getParticles()) {
+            if (particle == null) {
+                 continue;
+            }
+//            printWriter.print(particle.getId() + " " +j " " + particle.getDirection());
+            printWriter.printf("%d\t%d\t%d\t%s\n", particle.getId(), j, i, particle.getDirection());
+        }
+//        printWriter.println();
+//        printWriter.printf("%d %d %d %d %d %d %d %d %d %d %d\n",
+//                j,
+//                i,
+//                cells[i][j].getDirections()[1] ? 1 : 0,
+//                cells[i][j].getDirections()[0] ? 1 : 0,
+//                cells[i][j].getDirections()[5] ? 1 : 0,
+//                cells[i][j].getDirections()[4] ? 1 : 0,
+//                cells[i][j].getDirections()[3] ? 1 : 0,
+//                cells[i][j].getDirections()[2] ? 1 : 0,
+//                cells[i][j].isSolid() ? 1 : 0,
+//                cells[i][j].isSolid() ? 1 : 0,
+//                cells[i][j].getRandom()
+//        );
     }
 
     private static Cell[][] updateCellsWithNewDirections(Cell[][] cells) {
