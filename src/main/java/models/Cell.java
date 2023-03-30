@@ -2,9 +2,13 @@ package models;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Cell {
+
+    private Particle[] particles = new Particle[6];
+    private Particle[] nextParticles = new Particle[6];
+
     private boolean[] directions = new boolean[6];
     private boolean[] newDirections = new boolean[6];
     private boolean solid;
@@ -15,8 +19,8 @@ public class Cell {
         this.random = (int) Math.round(Math.random());
     }
 
-    public void createParticle(int direction) {
-        directions[direction] = true;
+    public void createParticle(Particle particle) {
+        particles[particle.getDirection().ordinal()] = particle;
     }
 
     public boolean[] getDirections() {
@@ -51,7 +55,31 @@ public class Cell {
         this.random = random;
     }
 
+    public Particle[] getParticles() {
+        return particles;
+    }
+
+    public void setParticles(Particle[] particles) {
+        this.particles = particles;
+    }
+
+    public Particle[] getNextParticles() {
+        return nextParticles;
+    }
+
+    public void setNextParticles(Particle[] nextParticles) {
+        this.nextParticles = nextParticles;
+    }
+
     public static Cell[][] initializeCells(int horizontal, int vertical, int d, String dynamicFile) throws FileNotFoundException {
+
+        Cell[][] cells = createGrid(horizontal, vertical, d);
+        readDynamic(cells, dynamicFile);
+
+        return cells;
+    }
+
+    public static Cell[][] createGrid (int horizontal, int vertical, int d){
 
         Cell[][] cells = new Cell[vertical][horizontal];
         for (int i = 0; i < vertical; i++) {
@@ -59,14 +87,13 @@ public class Cell {
                 // Create a solid border
                 if(i == 0 || j == 0 || i == vertical - 1 || j == horizontal - 1)
                     cells[i][j] = new Cell(true);
-                // Create a wall in the middle
+                    // Create a wall in the middle
                 else if(j == horizontal / 2 && (i < vertical / 2 - d/2 || i >= vertical / 2 + d/2))
                     cells[i][j] = new Cell(true);
                 else
                     cells[i][j] = new Cell(false);
             }
         }
-        readDynamic(cells, dynamicFile);
 
         return cells;
     }
@@ -80,11 +107,42 @@ public class Cell {
         while (sc.hasNextLine()){
             int i = sc.nextInt();
             int j = sc.nextInt();
-            cells[i][j].createParticle(sc.nextInt());
+            Particle particle = new Particle(Direction.values()[sc.nextInt()]);
+            cells[i][j].createParticle(particle);
         }
 
         sc.close();
     }
 
+    public Particle[] collision() {
+        if(this.solid) {
+            return rotate(3);
+        }
+        List<Direction> directionList = new ArrayList<>();
+        for (Particle particle: particles) {
+            if(particle != null)
+                directionList.add(particle.getDirection());
+        }
+
+        double xMomentum = Direction.xMomentum(directionList);
+        double yMomentum = Direction.yMomentum(directionList);
+        int size = Arrays.stream(this.particles).filter(Objects::nonNull).toArray().length;
+
+        if((xMomentum != 0 || yMomentum != 0) || size == 6 || size == 0) {
+            return this.particles;
+        } else {
+            int random = size == 3 ? 0 : this.random;
+            return rotate(1 + random);
+        }
+    }
+
+    private Particle[] rotate(int random) {
+        Particle[] rotatedParticles = new Particle[6];
+        for (int i = 0; i < rotatedParticles.length; i++) {
+            if(particles[i] != null)
+                rotatedParticles[i] = new Particle(particles[i].getDirection().rotate(random));
+        }
+        return rotatedParticles;
+    }
 
 }

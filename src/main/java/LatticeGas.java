@@ -1,18 +1,22 @@
 import models.Cell;
+import models.Direction;
+import models.Particle;
 import utils.ConsoleParser;
 import utils.Properties;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.*;
 
 public class LatticeGas {
 
     private static final double EPSILON = 0.1;
 
+    private static Properties properties = new Properties();
+
     public static void main(String[] args) throws FileNotFoundException {
 
-        Properties properties = new Properties();
 
         try {
             ConsoleParser.parseArguments(args, properties);
@@ -21,9 +25,11 @@ public class LatticeGas {
             return;
         }
 
+        //initialize cells
         Cell[][] cells = Cell.initializeCells(properties.getH(), properties.getV(), properties.getD(), ConsoleParser.dynamicFile);
 
         System.out.println("\n");
+
         try {
             FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
             PrintWriter printWriter = new PrintWriter(myWriter);
@@ -35,6 +41,7 @@ public class LatticeGas {
             int particles_left = 0;
             int iterations = 0;
             long start = System.currentTimeMillis();
+
             System.out.println("Particles right: " + particles_right);
             System.out.println("Particles total: " + properties.getN());
             System.out.println("Condición de corte: " + ((properties.getN() / 2) * (1 - EPSILON)));
@@ -46,23 +53,27 @@ public class LatticeGas {
                 printWriter.println(iterations);
                 particles_right = 0;
                 particles_left = 0;
+
                 for (int i = 0; i < cells.length; i++) {
                     for (int j = 0; j < cells[i].length; j++) {
-                        boolean[] inDirections = collectDirections(cells, i, j, i % 2 != 0);
-                        boolean[] outDirections;
-                        if(cells[i][j].isSolid())
-                            outDirections = inDirections;
-                        else
-                            outDirections = evaluate(inDirections, cells[i][j]);
-                        cells[i][j].setNewDirections(outDirections);
+//                        if(i > 0 && j > 0)
+//                            System.out.println("debug");
+                        cells[i][j].setNextParticles(cells[i][j].collision());
+//                        boolean[] inDirections = collectDirections(cells, i, j, i % 2 != 0);
+//                        boolean[] outDirections;
+//                        if(cells[i][j].isSolid())
+//                            outDirections = inDirections;
+//                        else
+//                            outDirections = evaluate(inDirections, cells[i][j]);
+//                        cells[i][j].setNewDirections(outDirections);
                         if (j > 100)
-                            particles_right += countCollisions(outDirections);
+                            particles_right += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
                         else
-                            particles_left += countCollisions(outDirections);
+                            particles_left += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
 //                        printOutputToFile(printWriter, cells, j, i);
                     }
                 }
-                updateCellsWithNewDirections(cells);
+                cells = updateCellsWithNewDirections(cells);
                 String aux = printCells(cells);
                 printWriter.println(aux);
                 iterations++;
@@ -97,37 +108,109 @@ public class LatticeGas {
         );
     }
 
-    private static void updateCellsWithNewDirections(Cell[][] cells) {
+    private static Cell[][] updateCellsWithNewDirections(Cell[][] cells) {
+        Cell[][] newCell = Cell.createGrid(cells.length, cells[0].length, properties.getD());
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
-                cells[i][j].setDirections(cells[i][j].getNewDirections());
+                for (Particle particle : cells[i][j].getNextParticles()) {
+                    if(particle == null)
+                        continue;
+                    int newRow = getNewRow(i,particle.getDirection());
+                    int newCol = getNewCol(i,j,particle.getDirection());
+                    if( (0 <= newCol && newCol < cells.length) && (0 <= newRow && newRow < cells.length) )
+                        newCell[newRow][newCol].createParticle(particle);
+                }
+
             }
         }
+        return newCell;
+    }
+
+    private static int getNewRow(int row, Direction direction){
+        if(direction.equals(Direction.B) || direction.equals(Direction.E))
+            return row;
+        else if(direction.equals(Direction.D) || direction.equals(Direction.C))
+            return row + 1 ;
+        else return row - 1;
+    }
+
+    private static int getNewCol(int row, int col, Direction direction){
+        boolean par = row % 2 == 0;
+        if (par) {
+            switch (direction) {
+                case F:
+                case D:
+                case E:
+                    return col - 1;
+                case B:
+                    return col + 1;
+                case A:
+                case C:
+                    return col;
+            }
+        } else {
+            switch (direction) {
+                case A:
+                case C:
+                case B:
+                    return col + 1;
+                case F:
+                case D:
+                    return col;
+                case E:
+                    return col - 1;
+            }
+        }
+        throw new RuntimeException("Invalid combination");
     }
 
     //i -> par: (i - 1, j) B, (i + 1, j) E, (i, j + 1) F, (i - 1, j + 1) A, (i, j - 1) D, (i - 1, j - 1) C
     //i -> impar: (i - 1, j) B , (i + 1, j) E, (i, j + 1) A, (i + 1, j + 1) F, (i, j - 1) C, (i + 1, j - 1) D
-    static boolean[] collectDirections(Cell[][] cells, int i, int j, boolean isOdd) {
-        boolean[] directions = new boolean[6];
-        directions[4] = checkNeighbour(cells, i, j - 1, 1);
-        directions[1] = checkNeighbour(cells, i, j + 1, 4);
+    static Particle[] collectDirections(Cell[][] cells, int i, int j, boolean isOdd) {
+        Particle[] particles = new Particle[6];
+
+        if(checkNeighbour(cells, i, j - 1, 1))
+            particles[4] =  new Particle(Direction.values()[3]);
+
+        if(checkNeighbour(cells, i, j + 1, 4))
+            particles[1] =  new Particle(Direction.values()[1]);
+//
+//        boolean[] directions = new boolean[6];
+//        directions[4] = ;
+//        directions[1] = checkNeighbour(cells, i, j + 1, 4);
         if (isOdd) {
-            directions[3] = checkNeighbour(cells, i + 1, j, 0);
-            directions[2] = checkNeighbour(cells, i + 1, j + 1, 5);
-            directions[5] = checkNeighbour(cells, i - 1, j, 2);
-            directions[0] = checkNeighbour(cells, i - 1, j + 1, 3);
+            if(checkNeighbour(cells, i + 1, j, 0))
+                particles[3] = new Particle(Direction.values()[3]);
+            if(checkNeighbour(cells, i + 1, j + 1, 5))
+                particles[2] = new Particle(Direction.values()[2]);
+            if(checkNeighbour(cells, i - 1, j, 2))
+                particles[5] = new Particle(Direction.values()[5]);
+            if(checkNeighbour(cells, i - 1, j + 1, 3))
+                particles[0] = new Particle(Direction.values()[0]);
+//            directions[3] = checkNeighbour(cells, i + 1, j, 0);
+//            directions[2] = checkNeighbour(cells, i + 1, j + 1, 5);
+//            directions[5] = checkNeighbour(cells, i - 1, j, 2);
+//            directions[0] = checkNeighbour(cells, i - 1, j + 1, 3);
         } else {
-            directions[2] = checkNeighbour(cells, i + 1, j, 5);
-            directions[3] = checkNeighbour(cells, i + 1, j - 1, 0);
-            directions[0] = checkNeighbour(cells, i - 1, j, 3);
-            directions[5] = checkNeighbour(cells, i - 1, j - 1, 2);
+            if(checkNeighbour(cells, i + 1, j - 1, 0))
+                particles[3] = new Particle(Direction.values()[3]);
+            if(checkNeighbour(cells, i + 1, j, 5))
+                particles[2] = new Particle(Direction.values()[2]);
+            if(checkNeighbour(cells, i - 1, j - 1, 2))
+                particles[5] = new Particle(Direction.values()[5]);
+            if(checkNeighbour(cells, i - 1, j, 3))
+                particles[0] = new Particle(Direction.values()[0]);
+//            directions[2] = checkNeighbour(cells, i + 1, j, 5);
+//            directions[3] = checkNeighbour(cells, i + 1, j - 1, 0);
+//            directions[0] = checkNeighbour(cells, i - 1, j, 3);
+//            directions[5] = checkNeighbour(cells, i - 1, j - 1, 2);
         }
-        return directions;
+        return particles;
     }
 
     static boolean checkNeighbour(Cell[][] cells, int i, int j, int index) {
         try {
-            return cells[i][j].getDirections()[index];
+            return cells[i][j].getNextParticles()[index] != null;
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
@@ -263,9 +346,9 @@ public class LatticeGas {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
                 StringBuilder sb_line = new StringBuilder();
-                for (int k = 0; k < cells[i][j].getDirections().length; k++) {
-                    if(cells[i][j].getDirections()[k])
-                        sb_line.append(k);
+                for (int k = 0; k < cells[i][j].getParticles().length; k++) {
+                    if(cells[i][j].getParticles()[k] != null)
+                        sb_line.append(cells[i][j].getParticles()[k].getDirection().ordinal());
                 }
                 if(sb_line.length() == 0)
                     sb_line.append("-");
