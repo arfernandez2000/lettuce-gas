@@ -23,7 +23,6 @@ public class LatticeGas {
 
         Cell[][] cells = Cell.initializeCells(properties.getH(), properties.getV(), properties.getD(), ConsoleParser.dynamicFile);
 
-        printCells(cells);
         System.out.println("\n");
         try {
             FileWriter myWriter = new FileWriter("src/main/resources/output.txt");
@@ -39,6 +38,9 @@ public class LatticeGas {
             System.out.println("Particles right: " + particles_right);
             System.out.println("Particles total: " + properties.getN());
             System.out.println("Condición de corte: " + ((properties.getN() / 2) * (1 - EPSILON)));
+
+            printWriter.println(printCells(cells));
+
             while (particles_right < ((int)(properties.getN() / 2) * (1 - EPSILON))) {
 //            for(int l = 0; l < 5; l++) {
                 printWriter.println(iterations);
