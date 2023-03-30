@@ -118,14 +118,14 @@ public class Cell {
         if(this.solid) {
             return rotate(3);
         }
-        List<Direction> directionList = new ArrayList<>();
+        List<Direction> directions = new ArrayList<>();
         for (Particle particle: particles) {
             if(particle != null)
-                directionList.add(particle.getDirection());
+                directions.add(particle.getDirection());
         }
 
-        double xMomentum = Direction.xMomentum(directionList);
-        double yMomentum = Direction.yMomentum(directionList);
+        double xMomentum = Direction.momentumX(directions);
+        double yMomentum = Direction.momentumY(directions);
         int size = Arrays.stream(this.particles).filter(Objects::nonNull).toArray().length;
 
         if((xMomentum != 0 || yMomentum != 0) || size == 6 || size == 0) {

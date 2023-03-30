@@ -32,20 +32,20 @@ public enum Direction {
     }
 
 
-    static double xMomentum(List<Direction> directionList){
-        double suma = 0;
-        for (Direction direction : directionList) {
-            suma += direction.x;
+    static double momentumX(List<Direction> directions){
+        double sum = 0;
+        for (Direction direction : directions) {
+            sum += direction.x;
         }
-        return suma;
+        return sum;
     }
 
-    static double yMomentum(List<Direction> directionList){
-        double suma = 0;
-        for (Direction direction : directionList) {
-            suma += direction.y;
+    static double momentumY(List<Direction> directions){
+        double sum = 0;
+        for (Direction direction : directions) {
+            sum += direction.y;
         }
-        return suma;
+        return sum;
     }
 
     @Override
