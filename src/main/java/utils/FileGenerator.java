@@ -15,6 +15,8 @@ public class FileGenerator {
     private static final int UPPER_J = 99;
     private static final int LOWER = 1;
 
+    public static String outFileName;
+
     public static void main(String[] args) {
         int N = ConsoleParser.parseArgumentsFileGenerator(args);
         HashMap<MutablePair<Integer, Integer>, Integer> cells = new HashMap<>();
@@ -32,7 +34,7 @@ public class FileGenerator {
             cells.putIfAbsent(new MutablePair<>(i, j), direction);
         }
         try {
-            File newFile = new File("src/main/resources/dynamicInput.txt");
+            File newFile = new File("src/main/resources/" + outFileName);
             FileWriter myWriter = new FileWriter(newFile);
             myWriter.write("I\tJ\tDIRECTION\n");
             boolean first = true;

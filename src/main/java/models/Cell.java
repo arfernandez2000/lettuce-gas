@@ -8,9 +8,6 @@ public class Cell {
 
     private Particle[] particles = new Particle[6];
     private Particle[] nextParticles = new Particle[6];
-
-    private boolean[] directions = new boolean[6];
-    private boolean[] newDirections = new boolean[6];
     private boolean solid;
     private int random;
 
@@ -21,22 +18,6 @@ public class Cell {
 
     public void createParticle(Particle particle) {
         particles[particle.getDirection().ordinal()] = particle;
-    }
-
-    public boolean[] getDirections() {
-        return directions;
-    }
-
-    public boolean[] getNewDirections() {
-        return newDirections;
-    }
-
-    public void setNewDirections(boolean[] newDirections) {
-        this.newDirections = newDirections;
-    }
-
-    public void setDirections(boolean[] directions) {
-        this.directions = directions;
     }
 
     public boolean isSolid() {

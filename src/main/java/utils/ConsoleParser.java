@@ -28,6 +28,7 @@ public class ConsoleParser {
         options.addOption("H",true, "Cantidad de celdas horizontales");
         options.addOption("V",true, "Cantidad de celdas verticales");
         options.addOption("D",true, "Tamaño de la rejilla");
+        options.addOption("out",true, "Nombre del archivo de salida");
         return options;
     }
 
@@ -50,9 +51,13 @@ public class ConsoleParser {
             } else
                 properties.setV(200);
             if (cmd.hasOption("D")) {
-                properties.setV(Integer.parseInt(cmd.getOptionValue("D")));
+                properties.setD(Integer.parseInt(cmd.getOptionValue("D")));
             } else
                 properties.setD(50);
+            if (cmd.hasOption("out")) {
+                properties.setOutFileName(cmd.getOptionValue("out"));
+            } else
+                properties.setOutFileName("output.txt");
             dynamicFile = cmd.getOptionValue("dynamicFile");
             properties.setN(Integer.parseInt(cmd.getOptionValue("N")));
 
@@ -70,14 +75,19 @@ public class ConsoleParser {
                 .desc("Cantidad de partículas").build();
         options.addOption(dynamicFile);
 
+        options.addOption("out",true, "Nombre del archivo de salida");
+
         CommandLine cmd;
         CommandLineParser parser = new BasicParser();
         HelpFormatter helper = new HelpFormatter();
 
         try {
             cmd = parser.parse(options, args);
+            if (cmd.hasOption("out")) {
+                FileGenerator.outFileName = cmd.getOptionValue("out");
+            } else
+                FileGenerator.outFileName = "dynamicInput.txt";
             return Integer.parseInt(cmd.getOptionValue("N"));
-
         } catch (ParseException e) {
             printHelp(helper, e, options);
         }

@@ -17,6 +17,8 @@ public class Properties {
 
     private Integer N;
 
+    private String outFileName;
+
     public Integer getV() {
         return V;
     }
@@ -35,6 +37,14 @@ public class Properties {
 
     public Integer getN() {
         return N;
+    }
+
+    public String getOutFileName() {
+        return outFileName;
+    }
+
+    public void setOutFileName(String outFileName) {
+        this.outFileName = outFileName;
     }
 
     public void setN(Integer n) {
