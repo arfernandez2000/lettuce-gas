@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class LatticeGas {
 
@@ -110,12 +111,28 @@ public class LatticeGas {
     }
 
     private static void printOutputToFile(PrintWriter printWriter, Cell[][] cells, int j, int i) {
+        long averageDirection = 0;
         for (Particle particle : cells[i][j].getParticles()) {
             if (particle == null) {
                  continue;
             }
-            printWriter.printf("%d\t%d\t%d\t%d\t%s\n", particle.getId(), j, i, 0, particle.getDirection());
+            averageDirection = (averageDirection + particle.getDirection().ordinal()) % 6;
+//            printWriter.printf("%d\t%d\t%d\t%d\t%d\t%s\n", particle.getId(), j, i, 0, Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).count() + cells[i][j].getRandom(), particle.getDirection());
         }
+//        x, y, z, particle_bit_array
+        printWriter.printf("%d\t%d\t%d\t%s\n", j, i, 0, particlesToBits(cells[i][j].getParticles()));
+    }
+
+    private static List<Integer> particlesToBits(Particle[] particles) {
+        List<Integer> bits = new ArrayList<>();
+        for (Particle particle : particles) {
+            if (particle == null) {
+                bits.add(0);
+            } else {
+                bits.add(1);
+            }
+        }
+        return bits;
     }
 
     private static Cell[][] updateCellsWithNewDirections(Cell[][] cells) {
