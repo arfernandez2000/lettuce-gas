@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class LatticeGas {
 
@@ -40,6 +39,7 @@ public class LatticeGas {
                 densityWriter = new FileWriter("src/main/resources/" + "density_" + properties.getOutFileName() + ".txt");
                 densityPrint = new PrintWriter(densityWriter);
                 densityPrint.println(properties.getN());
+                densityPrint.println(EPSILON);
             }
 
             FileWriter velocityWriter = new FileWriter("src/main/resources/" + "velocity_" + properties.getOutFileName() + ".txt");
@@ -50,6 +50,7 @@ public class LatticeGas {
             printWriter.println(properties.getH() + "\t" + properties.getV());
 
             velocityPrint.println(properties.getN());
+            velocityPrint.println(properties.getD());
 
 
             for (int r = 0; r < properties.getRuns(); r++) {
