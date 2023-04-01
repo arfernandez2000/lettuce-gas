@@ -29,6 +29,8 @@ public class ConsoleParser {
         options.addOption("V",true, "Cantidad de celdas verticales");
         options.addOption("D",true, "Tamaño de la rejilla");
         options.addOption("out",true, "Nombre del archivo de salida");
+        options.addOption("density",false, "Imprime la densidad de partículas en cada iteración");
+        options.addOption("runs",true, "Cantidad de corridas");
         return options;
     }
 
@@ -58,6 +60,14 @@ public class ConsoleParser {
                 properties.setOutFileName(cmd.getOptionValue("out"));
             } else
                 properties.setOutFileName("output.txt");
+
+            if (cmd.hasOption("runs")) {
+                properties.setRuns(Integer.parseInt(cmd.getOptionValue("runs")));
+            } else
+                properties.setRuns(1);
+
+            properties.setPrintDensity(cmd.hasOption("density"));
+
             dynamicFile = cmd.getOptionValue("dynamicFile");
             properties.setN(Integer.parseInt(cmd.getOptionValue("N")));
 

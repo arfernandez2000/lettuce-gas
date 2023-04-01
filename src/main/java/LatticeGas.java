@@ -26,7 +26,6 @@ public class LatticeGas {
         }
 
         //initialize cells
-        Cell[][] cells = Cell.initializeCells(properties.getH(), properties.getV(), properties.getD(), ConsoleParser.dynamicFile);
 
         System.out.println("\n");
 
@@ -34,47 +33,68 @@ public class LatticeGas {
             FileWriter myWriter = new FileWriter("src/main/resources/" + properties.getOutFileName() + ".txt");
             PrintWriter printWriter = new PrintWriter(myWriter);
 
-            FileWriter densityWriter = new FileWriter("src/main/resources/" + "density_" + properties.getOutFileName() + ".txt");
-            PrintWriter densityPrint = new PrintWriter(densityWriter);
+            FileWriter densityWriter = null;
+            PrintWriter densityPrint = null;
+            if(properties.isPrintDensity()) {
+                densityWriter = new FileWriter("src/main/resources/" + "density_" + properties.getOutFileName() + ".txt");
+                densityPrint = new PrintWriter(densityWriter);
+                densityPrint.println(properties.getN());
+            }
+
+            FileWriter velocityWriter = new FileWriter("src/main/resources/" + "velocity_" + properties.getOutFileName() + ".txt");
+            PrintWriter velocityPrint = new PrintWriter(velocityWriter);
 
             printWriter.println(properties.getN());
             printWriter.println(properties.getD());
             printWriter.println(properties.getH() + "\t" + properties.getV());
 
-            densityPrint.println(properties.getN());
+            velocityPrint.println(properties.getN());
 
-            int particles_right = 0;
-            int particles_left = 0;
-            int iterations = 0;
-            long start = System.currentTimeMillis();
 
-            while (particles_right < ((int)(properties.getN() / 2) * (1 - EPSILON))) {
-                printWriter.println(iterations);
-                particles_right = 0;
-                particles_left = 0;
+            for (int r = 0; r < properties.getRuns(); r++) {
 
-                for (int i = 0; i < cells.length; i++) {
-                    for (int j = 0; j < cells[i].length; j++) {
-                        cells[i][j].setNextParticles(cells[i][j].collision());
-                        if (j > 100)
-                            particles_right += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
-                        else
-                            particles_left += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
+                Cell[][] cells = Cell.initializeCells(properties.getH(), properties.getV(), properties.getD(), ConsoleParser.dynamicFile);
+                int particles_right = 0;
+                int particles_left;
+                int iterations = 0;
+
+                while (particles_right <= ((int) (properties.getN() / 2) * (1 - EPSILON))) {
+                    printWriter.println(iterations);
+                    particles_right = 0;
+                    particles_left = 0;
+
+                    for (int i = 0; i < cells.length; i++) {
+                        for (int j = 0; j < cells[i].length; j++) {
+                            cells[i][j].setNextParticles(cells[i][j].collision());
+                            if (j > 100)
+                                particles_right += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
+                            else
+                                particles_left += Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).toArray().length;
+                        }
                     }
+                    cells = updateCellsWithNewDirections(cells);
+                    if(r == 0)
+                        printOutput(printWriter, cells);
+
+                    if (properties.isPrintDensity() && densityPrint != null) {
+                        densityPrint.println(iterations);
+                        densityPrint.println(particles_left + "\t" + particles_right);
+                    }
+
+                    iterations++;
                 }
-                cells = updateCellsWithNewDirections(cells);
-                printOutput(printWriter, cells);
 
-                densityPrint.println(iterations);
-                densityPrint.println(particles_left + "\t" + particles_right);
+                printCells(cells);
 
-                iterations++;
+                velocityPrint.println(iterations);
+
+                if(r == properties.getRuns() - 1) {
+                    myWriter.close();
+                    if (densityWriter != null)
+                        densityWriter.close();
+                    velocityWriter.close();
+                }
             }
-            printCells(cells);
-            System.out.println("Iterations: " + iterations);
-            System.out.println("Time: " + (System.currentTimeMillis() - start) + " ms");
-            myWriter.close();
-            densityWriter.close();
 
         } catch (Exception e) {
             e.printStackTrace();

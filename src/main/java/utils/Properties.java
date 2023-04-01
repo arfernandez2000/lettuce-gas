@@ -19,6 +19,10 @@ public class Properties {
 
     private String outFileName;
 
+    private boolean printDensity;
+
+    private Integer runs;
+
     public Integer getV() {
         return V;
     }
@@ -37,6 +41,22 @@ public class Properties {
 
     public Integer getN() {
         return N;
+    }
+
+    public boolean isPrintDensity() {
+        return printDensity;
+    }
+
+    public void setPrintDensity(boolean printDensity) {
+        this.printDensity = printDensity;
+    }
+
+    public Integer getRuns() {
+        return runs;
+    }
+
+    public void setRuns(Integer runs) {
+        this.runs = runs;
     }
 
     public String getOutFileName() {
