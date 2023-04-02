@@ -12,10 +12,12 @@ import java.util.*;
 public class LatticeGas {
 
     private static final double EPSILON = 0.1;
+    private static final int H = 200;
+    private static final int V = 200;
 
     private static final Properties properties = new Properties();
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
 
 
         try {
@@ -47,7 +49,7 @@ public class LatticeGas {
 
             printWriter.println(properties.getN());
             printWriter.println(properties.getD());
-            printWriter.println(properties.getH() + "\t" + properties.getV());
+            printWriter.println(H + "\t" + V);
 
             velocityPrint.println(properties.getN());
             velocityPrint.println(properties.getD());
@@ -55,12 +57,12 @@ public class LatticeGas {
 
             for (int r = 0; r < properties.getRuns(); r++) {
 
-                Cell[][] cells = Cell.initializeCells(properties.getH(), properties.getV(), properties.getD(), ConsoleParser.dynamicFile);
+                Cell[][] cells = Cell.initializeCells(H, V, properties.getD(), ConsoleParser.dynamicFile);
                 int particles_right = 0;
                 int particles_left;
                 int iterations = 0;
 
-                while (particles_right <= ((int) (properties.getN() / 2) * (1 - EPSILON))) {
+                while (iterations < 3000) {
                     printWriter.println(iterations);
                     particles_right = 0;
                     particles_left = 0;
@@ -85,8 +87,6 @@ public class LatticeGas {
 
                     iterations++;
                 }
-
-                printCells(cells);
 
                 velocityPrint.println(iterations);
 
@@ -118,7 +118,6 @@ public class LatticeGas {
                  continue;
             }
             averageDirection = (averageDirection + particle.getDirection().ordinal()) % 6;
-//            printWriter.printf("%d\t%d\t%d\t%d\t%d\t%s\n", particle.getId(), j, i, 0, Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).count() + cells[i][j].getRandom(), particle.getDirection());
         }
 //        x, y, z, particle_bit_array
         printWriter.printf("%d\t%d\t%d\t%s\n", j, i, 0, particlesToBits(cells[i][j].getParticles()));
@@ -192,23 +191,23 @@ public class LatticeGas {
         throw new RuntimeException("Invalid combination");
     }
 
-    static String printCells(Cell[][] cells) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells[i].length; j++) {
-                StringBuilder sb_line = new StringBuilder();
-                for (int k = 0; k < cells[i][j].getParticles().length; k++) {
-                    if(cells[i][j].getParticles()[k] != null)
-                        sb_line.append(cells[i][j].getParticles()[k].getDirection().ordinal());
-                }
-                if(sb_line.length() == 0)
-                    sb_line.append("-");
-                if(cells[i][j].isSolid())
-                    sb_line = new StringBuilder("||");
-                sb.append(sb_line).append("\t");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
+//    static String printCells(Cell[][] cells) {
+//        StringBuilder sb = new StringBuilder();
+//        for (int i = 0; i < cells.length; i++) {
+//            for (int j = 0; j < cells[i].length; j++) {
+//                StringBuilder sb_line = new StringBuilder();
+//                for (int k = 0; k < cells[i][j].getParticles().length; k++) {
+//                    if(cells[i][j].getParticles()[k] != null)
+//                        sb_line.append(cells[i][j].getParticles()[k].getDirection().ordinal());
+//                }
+//                if(sb_line.length() == 0)
+//                    sb_line.append("-");
+//                if(cells[i][j].isSolid())
+//                    sb_line = new StringBuilder("||");
+//                sb.append(sb_line).append("\t");
+//            }
+//            sb.append("\n");
+//        }
+//        return sb.toString();
+//    }
 }

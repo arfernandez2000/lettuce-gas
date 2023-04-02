@@ -25,8 +25,6 @@ public class ConsoleParser {
                 .desc("Path al archivo de valores dinámicos").build();
         options.addOption(dynamicFile);
 
-        options.addOption("H",true, "Cantidad de celdas horizontales");
-        options.addOption("V",true, "Cantidad de celdas verticales");
         options.addOption("D",true, "Tamaño de la rejilla");
         options.addOption("out",true, "Nombre del archivo de salida");
         options.addOption("density",false, "Imprime la densidad de partículas en cada iteración");
@@ -44,14 +42,6 @@ public class ConsoleParser {
 
         try {
             cmd = parser.parse(options, args);
-            if (cmd.hasOption("H")) {
-                properties.setH(Integer.parseInt(cmd.getOptionValue("H")));
-            } else
-                properties.setH(200);
-            if (cmd.hasOption("V")) {
-                properties.setV(Integer.parseInt(cmd.getOptionValue("V")));
-            } else
-                properties.setV(200);
             if (cmd.hasOption("D")) {
                 properties.setD(Integer.parseInt(cmd.getOptionValue("D")));
             } else
