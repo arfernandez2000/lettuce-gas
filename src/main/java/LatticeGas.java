@@ -25,8 +25,6 @@ public class LatticeGas {
             return;
         }
 
-        //initialize cells
-
         System.out.println("\n");
 
         try {
@@ -118,9 +116,7 @@ public class LatticeGas {
                  continue;
             }
             averageDirection = (averageDirection + particle.getDirection().ordinal()) % 6;
-//            printWriter.printf("%d\t%d\t%d\t%d\t%d\t%s\n", particle.getId(), j, i, 0, Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).count() + cells[i][j].getRandom(), particle.getDirection());
         }
-//        x, y, z, particle_bit_array
         if (Arrays.stream(cells[i][j].getParticles()).filter(Objects::nonNull).count() > 0) {
             printWriter.printf("%d\t%d\t%s\n", j, i, particlesToBits(cells[i][j].getParticles()));
         }

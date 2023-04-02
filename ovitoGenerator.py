@@ -51,7 +51,7 @@ def direction_to_angle(direction: str) -> int:
 
 def density_to_color(density: float) -> tuple:
     if density == 1.0:
-        return 0.77, 0.83, 0.97 # 7
+        return 0.73, 0.81, 0.97 # 7
     if density > 1.6:
         return 0.0, 0.04, 0.54 # 0
     if density > 1.5:
@@ -121,7 +121,6 @@ def reduce_dimention(frame) -> str:
             line_count += 1
         poor_victim = calculate_densities(elements, l / square_side, poor_victim, iteration)
         iteration += 1
-        # concat_to_poor_victim(poor_victim, elements)
     return poor_victim
 
 
@@ -137,21 +136,17 @@ def get_particle_data(frame_file, color_dictionary: dict):
         poor_victim = poor_victim[2:]
         pls_stop = poor_victim.split('\n')
         frame_lines = []
-        line_count = 0
         iteration = 0
         for line in pls_stop:
             ll = line.split('\t')
             line_info = []
             if len(ll) > 1:
-                # Parses the particle list of bits and converts it to a rgb value. Example, [1,0,1,0,0,1] -> (1.0, 1.0, 0,5)
                 color_rgb = density_to_color(float(ll[3]))
                 color_rgb_list.append(color_rgb)
                 if color_dictionary.get(iteration) is None:
                     color_dictionary[iteration] = []
                 color_dictionary[iteration].append(color_rgb)
-                # line_count += 1
             if len(ll) == 1:
-                # print(line_count)
                 iteration += 1
             for index in ll:
                 if index.isnumeric():
@@ -159,13 +154,9 @@ def get_particle_data(frame_file, color_dictionary: dict):
             if len(line_info) > 1:
                 frame_lines.append(line_info)
             elif len(line_info) == 1:
-                # df = pd.DataFrame(np.array(frame_lines), columns=["id", "x", "y", "z", "speed", "angle", "radius"])
-                # df = pd.DataFrame(np.array(frame_lines), columns=["x", "y", "z", "color"])
                 df = pd.DataFrame(np.array(frame_lines), columns=["x", "y", "z"])
                 frames.append(df)
                 frame_lines = []
-        # df = pd.DataFrame(np.array(frame_lines), columns=["id", "x", "y", "z", "speed", "angle", "radius"])
-        # df = pd.DataFrame(np.array(frame_lines), columns=["x", "y", "z", "color"])
         df = pd.DataFrame(np.array(frame_lines), columns=["x", "y", "z"])
         frames.append(df)
     print(frames)
@@ -179,19 +170,9 @@ color_offset = 0
 def get_particles(data_frame, color_dictionary: dict):
     global color_offset
     particles = Particles()
-    # particles.create_property('Particle Identifier', data=data_frame.id)
     particles.create_property("Position", data=np.array((data_frame.x, data_frame.y, data_frame.z)).T)
-    # particles.create_property('Radius', data=data_frame.radius)
-    # particles.create_property('Color', data=np.array(color_rgb_list))
     particles.create_property('Color', data=np.array(color_dictionary[color_offset]))
-    # particles.create_property('Color', data=np.array(color_rgb_list[-(color_dictionary[color_offset]):]))
     color_offset += 1
-    # particles.create_property('Color', data=np.array(color_rgb_list))
-    # particles.create_property('Color', data=(1.0, 1.0, 0))
-    # particles.create_property('Angle', data=data_frame.angle)
-    # particles.create_property("Force", data=np.array(
-    #     (np.cos(data_frame.angle) * data_frame.speed, np.sin(data_frame.angle) * data_frame.speed, data_frame.z)).T)
-
     return particles
 
 
