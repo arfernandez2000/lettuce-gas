@@ -60,7 +60,7 @@ public class LatticeGas {
                 int particles_left;
                 int iterations = 0;
 
-                while (iterations < 3000) {
+                while (particles_right <= ((int) (properties.getN() / 2) * (1 - EPSILON))) {
                     printWriter.println(iterations);
                     particles_right = 0;
                     particles_left = 0;
