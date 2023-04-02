@@ -51,7 +51,7 @@ def direction_to_angle(direction: str) -> int:
 
 def density_to_color(density: float) -> tuple:
     if density == 1.0:
-        return 0.84, 0.9, 1.0 # 7
+        return 0.77, 0.83, 0.97 # 7
     if density > 1.6:
         return 0.0, 0.04, 0.54 # 0
     if density > 1.5:
@@ -117,7 +117,7 @@ def reduce_dimention(frame) -> str:
             if elements[x].get(y) is None:
                 elements[x][y] = []
             elements[x][y].append(
-                particle_list_to_density(line[3].replace("\n", "").replace("[", "").replace("]", "").split(",")))
+                particle_list_to_density(line[2].replace("\n", "").replace("[", "").replace("]", "").split(",")))
             line_count += 1
         poor_victim = calculate_densities(elements, l / square_side, poor_victim, iteration)
         iteration += 1
